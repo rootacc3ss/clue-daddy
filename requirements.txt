@@ -1,0 +1,25 @@
+# UI Framework and Theming
+PySide6>=6.6.0
+pyqtdarktheme>=0.1.7
+qtawesome>=1.3.0
+
+# Audio Processing
+sounddevice>=0.4.6
+SpeechRecognition>=3.10.0
+
+# AI Integration
+google-generativeai>=0.3.2
+
+# Utility Libraries
+mss>=9.0.1
+reportlab>=4.0.7
+pytesseract>=0.3.10
+pdf2image>=1.17.0
+Pillow>=10.1.0
+
+# Additional Dependencies
+requests>=2.31.0
+python-dotenv>=1.0.0
+cryptography>=41.0.7
+keyring>=24.3.0
+setuptools>=80.0.0
