@@ -153,7 +153,7 @@ class ClueDaddyApp(QApplication):
             # Setup application icon if available
             if ICONS_AVAILABLE:
                 try:
-                    icon = qta.icon('fa5s.user-secret', color='#00BCD4')
+                    icon = qta.icon('fa5s.user-secret', color='#E53E3E')
                     self.setWindowIcon(icon)
                     self.logger.info("Application icon set successfully")
                 except Exception as e:
@@ -184,28 +184,17 @@ class ClueDaddyApp(QApplication):
         # Close current window if any
         if self.current_window:
             self.current_window.close()
+            self.current_window = None
             
-        # This will be implemented in task 3.1
-        # For now, create a placeholder
-        from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
+        # Import and create onboarding controller
+        from .onboarding import OnboardingController
         
-        self.onboarding_window = QWidget()
-        self.onboarding_window.setWindowTitle("Welcome to Clue Daddy!")
-        self.onboarding_window.setFixedSize(400, 300)
+        self.onboarding_controller = OnboardingController(self)
+        self.onboarding_controller.onboarding_completed.connect(self._on_onboarding_completed)
+        self.onboarding_controller.onboarding_cancelled.connect(self._on_onboarding_cancelled)
         
-        layout = QVBoxLayout()
-        title_label = QLabel("Welcome to Clue Daddy!")
-        subtitle_label = QLabel("Let's get to cheating.")
-        layout.addWidget(title_label)
-        layout.addWidget(subtitle_label)
-        
-        self.onboarding_window.setLayout(layout)
-        self.onboarding_window.show()
-        
-        # Center the window
-        self._center_window(self.onboarding_window)
-        
-        self.current_window = self.onboarding_window
+        # Start the onboarding flow
+        self.onboarding_controller.start_onboarding()
         
     def show_main_gui(self):
         """Display main interface."""
@@ -254,6 +243,81 @@ class ClueDaddyApp(QApplication):
         """Check if this is the first time the application is launched."""
         return not self.config.first_time_setup_completed
         
+    def _on_onboarding_completed(self, onboarding_data: dict):
+        """Handle onboarding completion."""
+        self.logger.info("Onboarding completed successfully")
+        
+        try:
+            # Update configuration with onboarding data
+            self.config.gemini_api_key = onboarding_data.get('gemini_api_key', '')
+            self.config.personal_context = onboarding_data.get('personal_context', '')
+            self.config.first_time_setup_completed = True
+            
+            # Save configuration
+            success = self.save_configuration()
+            if success:
+                self.logger.info("Onboarding configuration saved successfully")
+            else:
+                self.logger.error("Failed to save onboarding configuration")
+                
+            # Clean up onboarding controller
+            if hasattr(self, 'onboarding_controller'):
+                self.onboarding_controller.cleanup()
+                self.onboarding_controller.deleteLater()
+                delattr(self, 'onboarding_controller')
+                
+            # Show main GUI
+            self.show_main_gui()
+            
+        except Exception as e:
+            self.logger.error(f"Error completing onboarding: {e}")
+            self._show_error_dialog("Setup Error", f"Failed to complete setup: {str(e)}")
+            
+    def _on_onboarding_cancelled(self):
+        """Handle onboarding cancellation."""
+        self.logger.info("Onboarding was cancelled")
+        
+        # Clean up onboarding controller
+        if hasattr(self, 'onboarding_controller'):
+            self.onboarding_controller.cleanup()
+            self.onboarding_controller.deleteLater()
+            delattr(self, 'onboarding_controller')
+            
+        # Exit application since setup is required
+        self.quit()
+        
+    def _show_error_dialog(self, title: str, message: str):
+        """Show error dialog with consistent styling."""
+        from PySide6.QtWidgets import QMessageBox
+        
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        msg_box.setIcon(QMessageBox.Icon.Critical)
+        msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        
+        # Apply dark theme styling
+        msg_box.setStyleSheet("""
+            QMessageBox {
+                background-color: #2b2b2b;
+                color: #ffffff;
+            }
+            QMessageBox QPushButton {
+                background-color: #E53E3E;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                font-weight: bold;
+                min-width: 80px;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #C53030;
+            }
+        """)
+        
+        msg_box.exec()
+
     def cleanup_and_exit(self):
         """Perform cleanup before application exit."""
         self.logger.info("Performing application cleanup")
@@ -261,6 +325,10 @@ class ClueDaddyApp(QApplication):
         # Stop cleanup timer
         if hasattr(self, 'cleanup_timer'):
             self.cleanup_timer.stop()
+            
+        # Clean up onboarding controller if exists
+        if hasattr(self, 'onboarding_controller'):
+            self.onboarding_controller.cleanup()
             
         # Close all windows
         if self.current_window:

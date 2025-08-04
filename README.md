@@ -26,6 +26,9 @@ This tool is for *anybody*, but really, I am refining this for the following:
 - **Privacy-focused**: All data stored locally
 - **Awesome Context System**: Allows for much better co
 - **Fully Customizable**: Our profile system allows you to tailor how your AI will respond for your situation.
+- **And So Much More**: We match Cluely in features and are heavily inspired by Cheating Daddy.
+
+If you want to see how we really are giving Cluely and Cheating Daddy a run for their money, see below.
 
 ## To Do
 
@@ -39,6 +42,7 @@ This tool is for *anybody*, but really, I am refining this for the following:
 - **Context Hacking**: Enhance context window by integrating a vector database for LARGE "Profiles" inside of the "Context Base"; sales teams and customer support will be able to store and parse gigabytes of files, easily. Includes responses in the current chat, so if the other party circles back, you can respond with confidence.
 - **Improved Latency**: Get responses MUCH faster with our system that is soon to be implemented.
 - **New Object Detection**: No more need to send a prompt or click the photo button every time something new to do analysis on pops up on your screen. Without spending your API credits, Clue Daddy intelligently knows when to respond to video.
+- **Updated Sessions Chatbot**: In the chat where you can talk about your prior sessions, you'll be able to talk about multiple at once.
 
 ## Project Structure
 

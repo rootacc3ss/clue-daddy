@@ -56,26 +56,40 @@
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
 - [ ] 3. Build onboarding system and first-time setup
-  - [ ] 3.1 Create welcome dialog and onboarding flow
+
+
+
+
+
+  - [x] 3.1 Create welcome dialog and onboarding flow
+
+
     - Implement welcome window with "Welcome to Clue Daddy!" title and subtitle
     - Create onboarding controller to manage setup flow
     - Implement navigation between onboarding steps
     - Apply dark theme and modern styling to onboarding windows
     - _Requirements: 1.1, 1.2_
 
-  - [ ] 3.2 Implement API key collection and validation
+  - [x] 3.2 Implement API key collection and validation
+
+
     - Create API key input dialog with secure text field
     - Implement Gemini API key validation using test API call
     - Add error handling for invalid API keys
     - Store validated API key securely in configuration
     - _Requirements: 1.3, 1.4_
 
-  - [ ] 3.3 Build personal context input interface
+  - [x] 3.3 Build personal context input interface
+
+
     - Create large text area for personal context and resume input
     - Implement context validation and character limits
     - Add helpful placeholder text and instructions
     - Save personal context to configuration upon completion
     - _Requirements: 1.4, 1.5_
+
+
+
 
   - [ ] 3.4 Complete onboarding flow and redirect to main GUI
     - Implement onboarding completion logic

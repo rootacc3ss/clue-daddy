@@ -28,7 +28,7 @@ class AppConfig:
     launch_at_startup: bool = False
     
     # Appearance Settings
-    accent_color: str = "#00BCD4"  # Teal default
+    accent_color: str = "#E53E3E"  # Red default
     font_size_multiplier: float = 1.0
     default_transparency: float = 0.65
     enable_animations: bool = True
