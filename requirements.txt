@@ -9,6 +9,7 @@ SpeechRecognition>=3.10.0
 
 # AI Integration
 google-generativeai>=0.3.2
+perplexity-ai>=0.1.0
 
 # Utility Libraries
 mss>=9.0.1

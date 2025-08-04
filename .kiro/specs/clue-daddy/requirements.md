@@ -128,28 +128,51 @@ Clue Daddy is a stealthy AI assistant application built with Python and Qt PySid
 3. WHEN a profile is single-clicked THEN the system SHALL select it
 4. WHEN a profile is double-clicked THEN the system SHALL open it for editing
 5. WHEN a profile is right-clicked THEN the system SHALL show context menu with Duplicate, Rename, Delete, Export options
-6. WHEN a profile is selected THEN the system SHALL show the Profile Editor in the right panel with tabs: Overview, Context, Files, Custom Instructions, Perplexity
+6. WHEN a profile is selected THEN the system SHALL show the Profile Editor in the right panel with tabs: Overview, Purpose & Behavior, Context, Files, Perplexity Research
 7. WHEN "New Profile" is pressed THEN the system SHALL open a blank editor with random accent color
 8. WHEN profile data is entered THEN the system SHALL validate required fields on save
 9. WHEN files are added THEN the system SHALL copy them to ~/.clue-daddy/profiles/<profile-id>/files/
 10. WHEN PDF files are added THEN the system SHALL automatically extract text via OCR
-11. WHEN the Perplexity tab is used THEN the system SHALL fetch answers via Perplexity API and append to Context tab with source citations
+11. WHEN the Purpose & Behavior tab is used THEN the system SHALL provide fields for profile purpose description and specific behavior instructions
+12. WHEN the Context tab is used THEN the system SHALL provide a large text area for additional context information and manual text input
+13. WHEN the Perplexity Research tab is used THEN the system SHALL allow users to ask research questions and fetch answers via Perplexity API
+14. WHEN Perplexity research is conducted THEN the system SHALL append answers with source citations to the Context tab automatically
+15. WHEN a profile is used in assistant mode THEN the system SHALL combine all profile data (purpose, behavior, context, files, research) into the AI system prompt
 
-### Requirement 10: Settings and Configuration
+### Requirement 10: Perplexity Research Integration
+
+**User Story:** As a user, I want to conduct research using Perplexity AI within my profiles so that I can automatically gather relevant information and context for my specific use cases.
+
+#### Acceptance Criteria
+
+1. WHEN the Perplexity Research tab is opened THEN the system SHALL display a question input field and research history
+2. WHEN a research question is entered THEN the system SHALL validate the question is not empty and contains meaningful content
+3. WHEN "Ask Perplexity" is clicked THEN the system SHALL send the question to Perplexity API and display loading indicator
+4. WHEN Perplexity responds THEN the system SHALL display the answer with proper formatting and source citations
+5. WHEN research is completed THEN the system SHALL automatically append the question, answer, and citations to the Context tab
+6. WHEN multiple research questions are asked THEN the system SHALL maintain a chronological history in the research tab
+7. WHEN research fails due to API errors THEN the system SHALL display user-friendly error messages and retry options
+8. WHEN Perplexity API key is missing THEN the system SHALL prompt user to add it in Settings with clear instructions
+9. WHEN research content is added to Context THEN the system SHALL format it with clear headers and source attribution
+10. WHEN a profile with research is used THEN the system SHALL include all research content in the AI system prompt context
+
+### Requirement 11: Settings and Configuration
 
 **User Story:** As a user, I want to configure application settings so that I can customize the behavior, appearance, and functionality to my preferences.
 
 #### Acceptance Criteria
 
 1. WHEN "Settings" is clicked THEN the system SHALL open a tabbed preferences window
-2. WHEN the General tab is selected THEN the system SHALL show API key, personal context, default profile, and startup options
+2. WHEN the General tab is selected THEN the system SHALL show Gemini API key, Perplexity API key, personal context, default profile, and startup options
 3. WHEN the Appearance tab is selected THEN the system SHALL show accent color picker, font size slider, transparency default, and animation toggle
 4. WHEN the AI tab is selected THEN the system SHALL show model selection, temperature, max tokens, system prompt editor, and search tool toggle
 5. WHEN the Hotkeys tab is selected THEN the system SHALL show configurable keyboard shortcuts
 6. WHEN the Privacy & Data tab is selected THEN the system SHALL show screenshot frequency, auto-delete options, and data management
 7. WHEN the About tab is selected THEN the system SHALL show version info, license, and update checking
-8. WHEN settings are changed THEN the system SHALL persist them to ~/.clue-daddy/config.json
-9. WHEN the application starts THEN the system SHALL load settings from the configuration file
+8. WHEN API keys are entered THEN the system SHALL validate their format and test connectivity
+9. WHEN Perplexity API key is missing THEN the system SHALL disable research functionality with clear messaging
+10. WHEN settings are changed THEN the system SHALL persist them to ~/.clue-daddy/config.json
+11. WHEN the application starts THEN the system SHALL load settings from the configuration file
 
 ### Requirement 11: Universal System Prompt Integration
 

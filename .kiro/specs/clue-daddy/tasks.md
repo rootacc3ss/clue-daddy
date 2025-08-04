@@ -14,22 +14,41 @@
   - Create requirements.txt and setup.py for dependency management
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7_
 
-- [ ] 2. Implement core application framework and configuration system
-  - [ ] 2.1 Create main application class and entry point
+- [x] 2. Implement core application framework and configuration system
+
+
+
+
+
+
+
+
+
+  - [x] 2.1 Create main application class and entry point
+
+
     - Implement ClueDaddyApp class extending QApplication
     - Setup application-wide configuration and theme management
     - Create main application window routing system
     - Implement global exception handling and logging
+
+
     - _Requirements: 1.1, 1.7, 10.8, 10.9_
 
-  - [ ] 2.2 Build configuration management system
+
+  - [x] 2.2 Build configuration management system
+
     - Create SettingsManager class for config persistence
     - Implement AppConfig dataclass with all settings categories
+
     - Create ~/.clue-daddy/ directory structure and config.json handling
     - Implement configuration validation and default value management
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9_
 
-  - [ ] 2.3 Setup database schema and session management foundation
+
+
+  - [x] 2.3 Setup database schema and session management foundation
+
     - Create SQLite database with tables for profiles, sessions, and interactions
     - Implement database connection management and migration system
     - Create base data models (Profile, Session, SessionInteraction classes)
@@ -219,12 +238,14 @@
     - Create New Profile, Save, Back buttons in top bar
     - _Requirements: 9.1, 9.2, 9.3, 9.7, 9.8_
 
-  - [ ] 11.2 Build comprehensive profile editor
-    - Create tabbed interface: Overview, Context, Files, Custom Instructions, Perplexity
-    - Implement Overview tab with name, type dropdown, description fields
-    - Add Context tab with large markdown editor for free-form text
+  - [ ] 11.2 Build comprehensive profile editor with all required tabs
+    - Create tabbed interface: Overview, Purpose & Behavior, Context, Files, Perplexity Research
+    - Implement Overview tab with name, type dropdown, description, and accent color picker
+    - Build Purpose & Behavior tab with purpose description field and behavior instructions field
+    - Add Context tab with large text area for additional context and auto-appended research
     - Build Files tab with drag-and-drop and file selector functionality
-    - _Requirements: 9.4, 9.5, 9.6_
+    - Create Perplexity Research tab with question input, research history, and API integration
+    - _Requirements: 9.4, 9.5, 9.6, 9.11, 10.1, 10.2_
 
   - [ ] 11.3 Implement file processing and OCR integration
     - Add support for PDF, DOCX, TXT, PNG, JPG file types
@@ -233,19 +254,25 @@
     - Store extracted text in database for search and context building
     - _Requirements: 9.9, 9.10_
 
-  - [ ] 11.4 Build Perplexity API integration for research
-    - Create Perplexity tab with question input and Generate button
-    - Integrate with Perplexity API for research question answering
-    - Append generated answers to Context tab with source citations
-    - Handle API errors and rate limiting gracefully
-    - _Requirements: 9.11_
+  - [ ] 11.4 Build comprehensive Perplexity API integration for research
+    - Create Perplexity Research tab with question input field and research history display
+    - Implement PerplexityClient class with API key management and validation
+    - Integrate with Perplexity API for research question answering with source citations
+    - Automatically append research results to Context tab with proper formatting
+    - Store research history in database with timestamps and source tracking
+    - Handle API errors, rate limiting, and missing API key scenarios gracefully
+    - Add research management features (delete, edit, re-run research)
+    - _Requirements: 9.11, 10.1, 10.9, 10.10_
 
-  - [ ] 11.5 Implement profile system prompt generation
-    - Build system prompt construction from profile data (purpose, behavior, files, context)
-    - Combine universal system prompt with profile-specific instructions
-    - Handle custom system prompt overrides from Custom Instructions tab
+  - [ ] 11.5 Implement comprehensive profile system prompt generation
+    - Build system prompt construction from ALL profile data: purpose, behavior instructions, additional context, files, and Perplexity research
+    - Combine universal system prompt with profile-specific data in structured format
+    - Include extracted text from uploaded files (PDFs, documents, images)
+    - Append all Perplexity research results with questions, answers, and source citations
+    - Handle custom system prompt overrides when specified
+    - Structure context with clear headers for each section (Purpose, Behavior, Context, Files, Research)
     - Ensure "I'm ready to help!" is appended to all generated prompts
-    - _Requirements: 11.1, 11.2, 11.3, 11.4_
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.8, 12.1, 12.2, 12.3, 12.4_
 
 - [ ] 12. Build comprehensive settings and configuration interface
   - [ ] 12.1 Create tabbed settings window
@@ -255,12 +282,14 @@
     - Implement settings persistence to config.json
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7_
 
-  - [ ] 12.2 Build General settings tab
-    - Create masked input for Google Gemini API Key
+  - [ ] 12.2 Build General settings tab with comprehensive API management
+    - Create masked input for Google Gemini API Key with validation
+    - Add masked input for Perplexity API Key with validation and connectivity testing
     - Add multiline text area for Personal Context editing
     - Implement Default Profile dropdown populated from database
     - Add Launch at System Startup checkbox with system integration
-    - _Requirements: 10.1_
+    - Display API key status indicators and error messages for invalid keys
+    - _Requirements: 11.1, 11.2, 11.8, 11.9_
 
   - [ ] 12.3 Implement Appearance settings tab
     - Create accent color picker with preview (default teal #00BCD4)

@@ -206,28 +206,61 @@ class SessionManager:
 
 ### 6. Profile Management (`profiles/`)
 
-**Purpose**: Context profiles for different use cases
+**Purpose**: Context profiles for different use cases with comprehensive data integration
 
 **Components**:
 - `profile_manager.py`: CRUD operations for profiles
-- `profile_editor.py`: Profile creation and editing interface
-- `file_processor.py`: Document handling and OCR
-- `perplexity_integration.py`: Research question generation
+- `profile_editor.py`: Profile creation and editing interface with tabbed layout
+- `file_processor.py`: Document handling and OCR for PDFs and images
+- `perplexity_integration.py`: Research question generation and API integration
+- `context_builder.py`: System prompt construction from all profile data
 
 **Interface**:
 ```python
 class ProfileManager:
     def create_profile(self, name: str, profile_type: str) -> Profile:
-        # Create new context profile
+        # Create new context profile with all required fields
+        
+    def update_profile_purpose(self, profile_id: str, purpose: str) -> None:
+        # Update profile purpose description
+        
+    def update_profile_behavior(self, profile_id: str, behavior_instructions: str) -> None:
+        # Update specific behavior instructions
+        
+    def update_profile_context(self, profile_id: str, additional_context: str) -> None:
+        # Update additional context text area
         
     def add_file_to_profile(self, profile_id: str, file_path: str) -> None:
-        # Process and store profile files
+        # Process and store profile files with OCR
         
-    def generate_context_from_perplexity(self, profile_id: str, question: str) -> str:
-        # Use Perplexity API for research
+    def conduct_perplexity_research(self, profile_id: str, question: str) -> PerplexityResult:
+        # Use Perplexity API for research and return structured result
+        
+    def append_research_to_context(self, profile_id: str, research: PerplexityResult) -> None:
+        # Automatically append research results to profile context
         
     def build_system_prompt(self, profile: Profile) -> str:
-        # Construct AI system prompt from profile data
+        # Construct comprehensive AI system prompt from all profile data
+        
+class PerplexityClient:
+    def __init__(self, api_key: str):
+        # Initialize Perplexity API client
+        
+    def ask_question(self, question: str) -> PerplexityResult:
+        # Send question to Perplexity and return structured response
+        
+    def validate_api_key(self) -> bool:
+        # Test API key validity
+        
+@dataclass
+class PerplexityResult:
+    question: str
+    answer: str
+    sources: List[str]
+    timestamp: datetime
+    
+    def format_for_context(self) -> str:
+        # Format research result for inclusion in profile context
 ```
 
 ### 7. Configuration System (`config/`)
@@ -264,6 +297,7 @@ class SettingsManager:
 class AppConfig:
     # General Settings
     gemini_api_key: str
+    perplexity_api_key: str
     personal_context: str
     default_profile_id: Optional[str]
     launch_at_startup: bool
@@ -301,11 +335,12 @@ class Profile:
     name: str
     profile_type: str  # interview, sales, meeting, presentation, negotiation, exam
     description: str
-    purpose: str
-    behavior_instructions: str
-    additional_context: str
-    custom_system_prompt: Optional[str]
+    purpose: str  # Detailed purpose description for the profile
+    behavior_instructions: str  # Specific behavior and response instructions
+    additional_context: str  # Free-form text area for manual context
+    custom_system_prompt: Optional[str]  # Optional system prompt override
     files: List[ProfileFile]
+    perplexity_research: List[PerplexityResearch]  # Research conducted for this profile
     created_at: datetime
     updated_at: datetime
     accent_color: str
@@ -317,8 +352,18 @@ class ProfileFile:
     filename: str
     file_path: str
     mime_type: str
-    extracted_text: Optional[str]  # For PDFs and images
+    extracted_text: Optional[str]  # For PDFs and images via OCR
     uploaded_at: datetime
+
+@dataclass
+class PerplexityResearch:
+    id: str
+    profile_id: str
+    question: str
+    answer: str
+    sources: List[str]  # Source URLs and citations
+    conducted_at: datetime
+    appended_to_context: bool  # Whether this research was added to additional_context
 ```
 
 ### Session Schema
@@ -408,6 +453,18 @@ CREATE TABLE session_interactions (
     audio_path TEXT,
     FOREIGN KEY (session_id) REFERENCES sessions (id) ON DELETE CASCADE
 );
+
+-- Perplexity research table
+CREATE TABLE perplexity_research (
+    id TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    sources TEXT, -- JSON array of source URLs
+    conducted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    appended_to_context BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (profile_id) REFERENCES profiles (id) ON DELETE CASCADE
+);
 ```
 
 ## Error Handling
@@ -491,13 +548,88 @@ def handle_error(error: Exception, context: str) -> None:
     └── test_settings_dialog.py
 ```
 
+## Profile System Prompt Integration
+
+### Comprehensive Context Building
+
+When a profile is selected for use with the AI assistant, the system constructs a comprehensive context by combining all profile data:
+
+```python
+def build_comprehensive_system_prompt(profile: Profile, universal_prompt: str) -> str:
+    """
+    Build complete system prompt combining universal prompt with all profile data
+    """
+    context_sections = []
+    
+    # Start with universal system prompt
+    context_sections.append(universal_prompt)
+    
+    # Add profile-specific sections
+    if profile.purpose:
+        context_sections.append(f"**PROFILE PURPOSE:**\n{profile.purpose}")
+    
+    if profile.behavior_instructions:
+        context_sections.append(f"**BEHAVIOR INSTRUCTIONS:**\n{profile.behavior_instructions}")
+    
+    if profile.additional_context:
+        context_sections.append(f"**ADDITIONAL CONTEXT:**\n{profile.additional_context}")
+    
+    # Add file contents
+    if profile.files:
+        file_contents = []
+        for file in profile.files:
+            if file.extracted_text:
+                file_contents.append(f"**FILE: {file.filename}**\n{file.extracted_text}")
+        if file_contents:
+            context_sections.append("**UPLOADED FILES:**\n" + "\n\n".join(file_contents))
+    
+    # Add Perplexity research
+    if profile.perplexity_research:
+        research_contents = []
+        for research in profile.perplexity_research:
+            sources_text = "\nSources: " + ", ".join(research.sources) if research.sources else ""
+            research_contents.append(f"**RESEARCH: {research.question}**\n{research.answer}{sources_text}")
+        if research_contents:
+            context_sections.append("**RESEARCH FINDINGS:**\n" + "\n\n".join(research_contents))
+    
+    # Combine all sections
+    full_prompt = "\n\n".join(context_sections)
+    
+    # Always end with the ready message instruction
+    full_prompt += "\n\nI'm ready to help!"
+    
+    return full_prompt
+```
+
+### Profile Tab Structure
+
+The Profile Editor provides a comprehensive interface with the following tabs:
+
+1. **Overview Tab**: Basic profile information (name, type, description, accent color)
+2. **Purpose & Behavior Tab**: 
+   - Purpose description field (what this profile is for)
+   - Behavior instructions field (how the AI should behave)
+3. **Context Tab**: 
+   - Large text area for additional context
+   - Automatically appended Perplexity research results
+4. **Files Tab**: 
+   - Drag-and-drop file upload
+   - Automatic OCR for PDFs and images
+   - File management and preview
+5. **Perplexity Research Tab**:
+   - Question input field
+   - Research history display
+   - Automatic context integration
+
 ## Security Considerations
 
 ### API Key Management
 
-- Store API keys encrypted using system keyring
+- Store both Gemini and Perplexity API keys encrypted using system keyring
 - Never log or display API keys in plain text
-- Validate API key format before storage
+- Validate API key format and test connectivity before storage
+- Gracefully handle missing Perplexity API key by disabling research features
+- Provide clear error messages when API keys are invalid or missing
 
 ### Data Privacy
 
